@@ -50,8 +50,20 @@ public class Conversor {
             System.out.print("Seleccione moneda destino (número): ");
             int opcionDestino = scanner.nextInt();
 
+            // Validar selección de opciones
+            if (opcionBase < 1 || opcionBase > monedas.length || opcionDestino < 1 || opcionDestino > monedas.length) {
+                System.out.println("Selección de moneda inválida. Intente de nuevo.");
+                continue;
+            }
+
             System.out.print("Cantidad a convertir: ");
             double cantidad = scanner.nextDouble();
+
+            // Validar cantidad positiva
+            if (cantidad <= 0) {
+                System.out.println("La cantidad debe ser mayor que cero.");
+                continue;
+            }
 
             String base = codigos[opcionBase - 1];
             String destino = codigos[opcionDestino - 1];
@@ -64,7 +76,7 @@ public class Conversor {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
-            // Validación
+            // Validación de éxito en respuesta
             if (!json.get("result").getAsString().equals("success")) {
                 System.out.println("Error al obtener tasas de cambio:");
                 System.out.println(json);
@@ -80,13 +92,12 @@ public class Conversor {
 
             double tasa = rates.get(destino).getAsDouble();
             double resultado = cantidad * tasa;
+
             System.out.println("___________________________________________________________________");
             System.out.printf("\n%.2f %s equivalen a %.2f %s\n", cantidad, monedas[opcionBase - 1], resultado, monedas[opcionDestino - 1]);
-            System.out.println("____________________________________________________________________");
-
+            System.out.printf("Tasa de cambio: 1 %s = %.4f %s\n", monedas[opcionBase - 1], tasa, monedas[opcionDestino - 1]);
+            System.out.println("___________________________________________________________________");
         }
 
         scanner.close();
-
     }
-}
